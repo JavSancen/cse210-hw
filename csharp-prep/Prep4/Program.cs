@@ -56,8 +56,8 @@ class Program
         List<int> sortedNumbers = numbers.OrderBy(x => x).ToList();
 
         foreach (int sortedNumber in sortedNumbers) {
-          // Do something with the sorted number here
-          Console.WriteLine(sortedNumber); // Example: Print the sorted number
+
+            Console.WriteLine(sortedNumber);
 }
     }
 }
