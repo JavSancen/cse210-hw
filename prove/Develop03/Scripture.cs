@@ -20,6 +20,7 @@ class Scripture
         }
     }
 
+    // It is to enter the number of words you want
     public void HideRandomWords(int numberToHide)
     {
         Random random = new Random();
