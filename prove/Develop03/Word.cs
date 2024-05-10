@@ -28,7 +28,7 @@ class Word
     {
         if (_isHidden)
         {
-            return "*****";
+            return "____";
         }
         else
         {
