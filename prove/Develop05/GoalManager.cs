@@ -6,11 +6,13 @@ public class GoalManager
 {
     private List<Goal> _goals;
     private int _score;
+    private int _sessionScore; // Session score to store temporarily
 
     public GoalManager()
     {
         _goals = new List<Goal>();
         _score = 0;
+        _sessionScore = 0;
     }
 
     public void Start()
@@ -59,11 +61,14 @@ public class GoalManager
         }
     }
 
+
     public void DisplayPlayerInfo()
     {
-        Console.WriteLine($"Current Score: {_score}");
-    }
+        int totalScore = _score + _sessionScore; // Include session score in total score
 
+        Console.WriteLine($"Session Score: {_sessionScore}");
+        Console.WriteLine($"Total Score: {totalScore}");
+    }
     public void ListGoalNames()
     {
         Console.WriteLine("Goals:");
@@ -115,10 +120,10 @@ public class GoalManager
                 goal = new EternalGoal(name, description, points);
                 break;
             case "ChecklistGoal":
-                Console.WriteLine("Enter target:");
+                Console.WriteLine("Enter target (number of times to complete):");
                 int target = int.Parse(Console.ReadLine());
 
-                Console.WriteLine("Enter bonus:");
+                Console.WriteLine("Enter bonus points for completing all targets:");
                 int bonus = int.Parse(Console.ReadLine());
 
                 goal = new ChecklistGoal(name, description, points, target, bonus);
@@ -131,33 +136,35 @@ public class GoalManager
         _goals.Add(goal);
         Console.WriteLine("Goal created successfully.");
     }
-
-public void RecordEvent()
-{
-    Console.WriteLine("Enter goal name:");
-    string goalName = Console.ReadLine();
-
-    Goal goal = _goals.Find(g => g.GetDetailsString().Contains(goalName));
-
-    if (goal != null)
+    public void RecordEvent()
     {
-        goal.RecordEvent();
-        if (goal.IsComplete())
+        Console.WriteLine("Enter goal name:");
+        string goalName = Console.ReadLine();
+
+        Goal goal = _goals.Find(g => g.GetDetailsString().Contains(goalName));
+
+        if (goal != null)
         {
-            _score += goal.GetDetailsString().Split(',').Length; // Add points for the goal
-
-            if (goal is ChecklistGoal checklistGoal)
+            goal.RecordEvent();
+            if (goal.IsComplete())
             {
-                _score += checklistGoal.Bonus; // Add bonus points if the checklist goal is complete
+                int pointsEarned = goal.Points;
+                _sessionScore += pointsEarned; // Add points to session score
+
+                if (goal is ChecklistGoal checklistGoal)
+                {
+                    _sessionScore += checklistGoal.Bonus; // Add bonus points to session score
+                }
             }
+            Console.WriteLine("Event recorded successfully.");
         }
-        Console.WriteLine("Event recorded successfully.");
+        else
+        {
+            Console.WriteLine("Goal not found.");
+        }
     }
-    else
-    {
-        Console.WriteLine("Goal not found.");
-    }
-}
+
+    // SaveScore method is no longer needed as session score is now handled within RecordEvent
 
     public void SaveGoals()
     {
@@ -172,6 +179,16 @@ public void RecordEvent()
         }
 
         Console.WriteLine("Goals saved successfully.");
+    }
+
+    public void SaveScore(int pointsEarned)
+    {
+        string fileName = "score.txt";
+
+        using (StreamWriter outputFile = new StreamWriter(fileName, true))
+        {
+            outputFile.WriteLine(pointsEarned);
+        }
     }
 
     public void LoadGoals()
